@@ -15,9 +15,6 @@ import 'office-ui-fabric-react/lib/components/List/Examples/List.Ghosting.Exampl
 import { IPersonaSharedProps, Persona, PersonaSize, PersonaPresence } from 'office-ui-fabric-react/lib/Persona';
 import { Checkbox } from 'office-ui-fabric-react/lib/Checkbox';
 import { Label } from 'office-ui-fabric-react/lib/Label';
-import { HoverCard, IExpandingCardProps, ExpandingCardMode } from 'office-ui-fabric-react/lib/HoverCard';
-
-import { DirectionalHint } from 'office-ui-fabric-react/lib/common/DirectionalHint';
 
 const examplePersona: IPersonaSharedProps = {
   imageInitials: 'AL',
@@ -28,8 +25,12 @@ const examplePersona: IPersonaSharedProps = {
 };
 
 
+
+
 export default class WPprojectdetails extends React.Component<IWPprojectdetailsProps, {}> {
+
   public state: IWPprojectdetailsProps;
+
   constructor(props, context) {
     super(props);
     this.state = {
@@ -53,22 +54,6 @@ export default class WPprojectdetails extends React.Component<IWPprojectdetailsP
       UserArray: [],
       UserIds: [],
       PersonaArray: [],
-      PersonNameArray: [],
-
-      ProjectOpenAirId: "",
-      ProjectCode: "",
-      Client: "",
-      ClientContact: "",
-      ProjectStartDate: "",
-      ProjectPlannedHours: "",
-      ProjectPlannedDays: "",
-      ProjectReportingRequirements: "",
-      ProjectDeliverables: "",
-      ProjectUsefulLinks: "",
-
-
-
-
 
     };
     this.itemdetails = this.itemdetails.bind(this);
@@ -76,9 +61,14 @@ export default class WPprojectdetails extends React.Component<IWPprojectdetailsP
     this.findPrevious = this.findPrevious.bind(this);
   }
 
+
+
+
   componentDidMount() {
     this.GetUSerDetails();
   }
+
+
   private GetUSerDetails() {
     var NewISiteUrl = this.props.siteurl;
     var NewSiteUrl = NewISiteUrl.replace("/SitePages", "");
@@ -87,10 +77,18 @@ export default class WPprojectdetails extends React.Component<IWPprojectdetailsP
     pnp.sp.profiles.myProperties.get().then(function (result) {
       var props = result.UserProfileProperties;
       var propValue = "";
+
+
+
       props.forEach(function (prop) {
         if (prop.Key == "AccountName") {
           var TempEmail = prop.Value;
           var TempEmailFinal = TempEmail.replace("i:0#.f|membership|", "");
+
+
+
+
+
         }
       });
     });
@@ -108,6 +106,51 @@ export default class WPprojectdetails extends React.Component<IWPprojectdetailsP
 
 
   }
+
+
+
+  public ParsingUserNames() {
+    this.getuserNamesById();
+  }
+
+  public getuserNamesById() {
+
+    var TempUserArray = [];
+    var TmpArray = this.state.UserIds;
+    for (var i = 0; i < this.state.UserIds.length; i++) {
+      var NewISiteUrl = this.props.siteurl;
+      var NewSiteUrl = NewISiteUrl.replace("/SitePages", "");
+      let webx = new Web(NewSiteUrl);
+      var Tmpstr = "";
+      Tmpstr = TmpArray[i];
+      var NumberParse = parseInt(Tmpstr);
+      webx.siteUsers.getById(NumberParse).get().then(function (result) {
+        var NewItem = {
+          Id: result.Id,
+          Name: result.Title,
+        }
+        TempUserArray.push(NewItem);
+      });
+    }
+    this.setState({
+      UserArray: TempUserArray
+    });
+
+
+
+
+  }
+
+
+  public inArray(needle, haystack) {
+    var length = haystack.length;
+    for (var i = 0; i < length; i++) {
+      if (haystack[i] == needle)
+        return true;
+    }
+    return false;
+  }
+
 
   private getProjectdetails() {
     var NewISiteUrl = this.props.siteurl;
@@ -160,49 +203,7 @@ export default class WPprojectdetails extends React.Component<IWPprojectdetailsP
 
     });
   }
-  public ParsingUserNames() {
-    this.getuserNamesById();
-  }
 
-  public getuserNamesById() {
-    var TempUserArray = [];
-    var TmpArray = this.state.UserIds;
-    for (var i = 0; i < this.state.UserIds.length; i++) {
-      var NewISiteUrl = this.props.siteurl;
-      var NewSiteUrl = NewISiteUrl.replace("/SitePages", "");
-      let webx = new Web(NewSiteUrl);
-      var Tmpstr = "";
-      Tmpstr = TmpArray[i];
-      var NumberParse = parseInt(Tmpstr);
-      webx.siteUsers.getById(NumberParse).get().then(function (result) {
-        var NewItem = {
-          Id: result.Id,
-          Name: result.Title,
-          Organization: result.Title,
-          Email: result.Title,
-          Tel: result.Title,
-          Location: result.Title,
-        }
-        TempUserArray.push(NewItem);
-      });
-    }
-    this.setState({
-      UserArray: TempUserArray
-    });
-
-
-
-
-  }
-
-  public inArray(needle, haystack) {
-    var length = haystack.length;
-    for (var i = 0; i < length; i++) {
-      if (haystack[i] == needle)
-        return true;
-    }
-    return false;
-  }
   private _setShowPanel = (showPanel: boolean): (() => void) => {
     return (): void => {
       this.setState({ showPanel });
@@ -226,21 +227,17 @@ export default class WPprojectdetails extends React.Component<IWPprojectdetailsP
     var ManagerIdInArray = TempComplete[0]["ManagerName"];
     var TeammembersIdsArray = TempComplete[0]["TeamMemebers"];
 
-    var FinalName = "";
     var UserArray1 = this.state.UserArray;
     if (isNaN(AuthorIdInArray) == false) {
       UserArray1 = UserArray1.filter(function (UserArray1) {
         return UserArray1["Id"] == AuthorIdInArray;
       });
       TempComplete[0]["AuthoName"] = UserArray1[0]["Name"];
-      FinalName = UserArray1[0]["Name"];
-    } else {
-      FinalName = TempComplete[0]["AuthoName"];
     }
 
     var NewObject1 = {
-      imageInitials: '',
-      text: FinalName,
+      imageInitials: 'AL',
+      text: UserArray1[0]["Name"],
       secondaryText: 'Software Engineer',
       tertiaryText: 'In a meeting',
       optionalText: 'Available at 4:00pm'
@@ -255,14 +252,11 @@ export default class WPprojectdetails extends React.Component<IWPprojectdetailsP
         return UserArray1["Id"] == ManagerIdInArray;
       });
       TempComplete[0]["ManagerName"] = UserArray1[0]["Name"];
-      FinalName = UserArray1[0]["Name"];
-    } else {
-      FinalName = TempComplete[0]["ManagerName"];
     }
 
     var NewObject2 = {
-      imageInitials: '',
-      text: FinalName,
+      imageInitials: 'AL',
+      text: UserArray1[0]["Name"],
       secondaryText: 'Software Engineer',
       tertiaryText: 'In a meeting',
       optionalText: 'Available at 4:00pm'
@@ -272,7 +266,6 @@ export default class WPprojectdetails extends React.Component<IWPprojectdetailsP
     var Arobject = [];
 
     var TeamMemebrNameString = [];
-
     for (var y = 0; y < TeammembersIdsArray.length; y++) {
 
       var UserArray1 = this.state.UserArray;
@@ -281,22 +274,40 @@ export default class WPprojectdetails extends React.Component<IWPprojectdetailsP
           return UserArray1["Id"] == TeammembersIdsArray[y];
         });
         TeamMemebrNameString.push(UserArray1[0]["Name"]);
-      } else {
-        TeamMemebrNameString.push(TeammembersIdsArray[y]);
+        var NewObject3 = {
+          imageInitials: 'AL',
+          text: UserArray1[0]["Name"],
+          secondaryText: 'Software Engineer',
+          tertiaryText: 'In a meeting',
+          optionalText: 'Available at 4:00pm'
+        }
+        Arobject.push(NewObject3);
+
       }
     }
     TempComplete[0]["TeamMemebers"] = TeamMemebrNameString;
+
     TempPerosonaArra.push(Arobject);
+
+
+
+
+
+
+
+
     this.setState(
       {
         SelectedItemId: parseInt(tmpString),
         showPanel: true,
         SelectedItemArray: TempComplete,
-        PersonaArray: TempPerosonaArra,
-        PersonNameArray: TeamMemebrNameString,
+        PersonaArray:TempPerosonaArra
       }
     )
   }
+
+
+
 
   private _onClosePanel = () => {
     this.setState({ showPanel: false });
@@ -314,11 +325,7 @@ export default class WPprojectdetails extends React.Component<IWPprojectdetailsP
   };
 
   public findNext() {
-
     var tempCurrenItem = this.state.SelectedItemId;
-    var TempPerosonaArra = [];
-    var FinalName = "";
-
     if (tempCurrenItem < this.state._items.length) {
       var NewTempNumber = tempCurrenItem + 1;
       var TempAllArray = this.state._items;
@@ -336,20 +343,7 @@ export default class WPprojectdetails extends React.Component<IWPprojectdetailsP
           return UserArray1["Id"] == AuthorIdInArray;
         });
         TempComplete[0]["AuthoName"] = UserArray1[0]["Name"];
-        FinalName = UserArray1[0]["Name"];
-      } else {
-        FinalName = TempComplete[0]["AuthoName"];
-
       }
-      var NewObject1 = {
-        imageInitials: '',
-        text: FinalName,
-        secondaryText: 'Software Engineer',
-        tertiaryText: 'In a meeting',
-        optionalText: 'Available at 4:00pm'
-      }
-      TempPerosonaArra.push(NewObject1);
-
 
       if (isNaN(ManagerIdInArray) == false) {
         UserArray1 = this.state.UserArray;
@@ -357,19 +351,7 @@ export default class WPprojectdetails extends React.Component<IWPprojectdetailsP
           return UserArray1["Id"] == ManagerIdInArray;
         });
         TempComplete[0]["ManagerName"] = UserArray1[0]["Name"];
-        FinalName = UserArray1[0]["Name"];
-      } else {
-        FinalName = TempComplete[0]["ManagerName"];
       }
-
-      var NewObject2 = {
-        imageInitials: '',
-        text: FinalName,
-        secondaryText: 'Software Engineer',
-        tertiaryText: 'In a meeting',
-        optionalText: 'Available at 4:00pm'
-      }
-      TempPerosonaArra.push(NewObject2);
 
       var TeamMemebrNameString = [];
 
@@ -382,8 +364,6 @@ export default class WPprojectdetails extends React.Component<IWPprojectdetailsP
           });
           TeamMemebrNameString.push(UserArray1[0]["Name"]);
           conversioncounter++;
-        } else {
-          TeamMemebrNameString.push(TeammembersIdsArray[y]);
         }
       }
 
@@ -396,9 +376,6 @@ export default class WPprojectdetails extends React.Component<IWPprojectdetailsP
           SelectedItemId: NewTempNumber,
           showPanel: true,
           SelectedItemArray: TempComplete,
-          PersonaArray: TempPerosonaArra,
-          PersonNameArray: TeamMemebrNameString,
-
         });
     }
 
@@ -408,7 +385,6 @@ export default class WPprojectdetails extends React.Component<IWPprojectdetailsP
   public findPrevious() {
     var tempCurrenItem = this.state.SelectedItemId;
     var NewTempNumber = tempCurrenItem - 1;
-    var TempPerosonaArra = [];
     if (NewTempNumber >= 1) {
       var TempAllArray = this.state._items;
       var TempComplete = TempAllArray.filter(function (TempAllArray) {
@@ -418,7 +394,7 @@ export default class WPprojectdetails extends React.Component<IWPprojectdetailsP
       var AuthorIdInArray = TempComplete[0]["AuthoName"];
       var ManagerIdInArray = TempComplete[0]["ManagerName"];
       var TeammembersIdsArray = TempComplete[0]["TeamMemebers"];
-      var FinalName = "";
+
 
 
       if (isNaN(AuthorIdInArray) == false) {
@@ -427,21 +403,7 @@ export default class WPprojectdetails extends React.Component<IWPprojectdetailsP
           return UserArray1["Id"] == AuthorIdInArray;
         });
         TempComplete[0]["AuthoName"] = UserArray1[0]["Name"];
-        FinalName = UserArray1[0]["Name"];
-      } else {
-        FinalName = TempComplete[0]["AuthoName"];
       }
-
-      var NewObject1 = {
-        imageInitials: '',
-        text: FinalName,
-        secondaryText: 'Software Engineer',
-        tertiaryText: 'In a meeting',
-        optionalText: 'Available at 4:00pm'
-      }
-      TempPerosonaArra.push(NewObject1);
-
-
 
       if (isNaN(ManagerIdInArray) == false) {
         UserArray1 = this.state.UserArray;
@@ -449,19 +411,7 @@ export default class WPprojectdetails extends React.Component<IWPprojectdetailsP
           return UserArray1["Id"] == ManagerIdInArray;
         });
         TempComplete[0]["ManagerName"] = UserArray1[0]["Name"];
-        FinalName = UserArray1[0]["Name"];
       }
-      else {
-        FinalName = TempComplete[0]["ManagerName"];
-      }
-      var NewObject2 = {
-        imageInitials: '',
-        text: FinalName,
-        secondaryText: 'Software Engineer',
-        tertiaryText: 'In a meeting',
-        optionalText: 'Available at 4:00pm'
-      }
-      TempPerosonaArra.push(NewObject2);
 
       var TeamMemebrNameString = [];
 
@@ -474,8 +424,6 @@ export default class WPprojectdetails extends React.Component<IWPprojectdetailsP
           });
           TeamMemebrNameString.push(UserArray1[0]["Name"]);
           conversioncounter++;
-        } else {
-          TeamMemebrNameString.push(TeammembersIdsArray[y]);
         }
       }
 
@@ -485,165 +433,27 @@ export default class WPprojectdetails extends React.Component<IWPprojectdetailsP
 
 
 
+
       this.setState(
         {
           SelectedItemId: NewTempNumber,
           showPanel: true,
           SelectedItemArray: TempComplete,
-          PersonaArray: TempPerosonaArra,
-          PersonNameArray: TeamMemebrNameString,
         });
 
     }
   }
 
-  public GetContcatCardManager() {
-    //alert("manager");
-  }
-
-  public GetContactCardTeamMembers(items) {
-    //alert(items);
-  }
-
-  private _onRenderExpandedCard = (item: any): JSX.Element => {
-    var TempUserPropArray = this.state.UserArray;
-    var ManagerName = this.state.PersonaArray[1]["text"];
-
-    TempUserPropArray = TempUserPropArray.filter(function (TempUserPropArray) {
-      return TempUserPropArray["Name"] == ManagerName;
-    });
-
-    return (
-      <div className="hoverCardExample-expandedCard">
-
-        <div className="ms-Grid-row">
-          <div className={styles.PaddingSpace}>
-            <div className="ms-Grid-col ms-sm6 ms-md4 ms-lg4">
-              Organization
-              </div>
-            <div className="ms-Grid-col ms-sm6 ms-md8 ms-lg8">
-              {TempUserPropArray[0]["Organization"]}
-            </div>
-          </div>
-        </div>
-
-        <div className="ms-Grid-row">
-          <div className={styles.PaddingSpace}>
-            <div className="ms-Grid-col ms-sm6 ms-md4 ms-lg4">
-              Tel
-              </div>
-            <div className="ms-Grid-col ms-sm6 ms-md8 ms-lg8">
-              {TempUserPropArray[0]["Tel"]}
-            </div>
-          </div>
-        </div>
 
 
-        <div className="ms-Grid-row">
-          <div className={styles.PaddingSpace}>
-            <div className="ms-Grid-col ms-sm6 ms-md4 ms-lg4">
-              Emails
-              </div>
-            <div className="ms-Grid-col ms-sm6 ms-md8 ms-lg8">
-              {TempUserPropArray[0]["Email"]}
-            </div>
-          </div>
-        </div>
-
-
-        <div className="ms-Grid-row">
-          <div className={styles.PaddingSpace}>
-            <div className="ms-Grid-col ms-sm6 ms-md4 ms-lg4">
-              Location
-              </div>
-            <div className="ms-Grid-col ms-sm6 ms-md8 ms-lg8">
-              {TempUserPropArray[0]["Location"]}
-            </div>
-          </div>
-        </div>
-
-      </div>
-    );
-  };
-
-
-  private _onRenderCompactCard = (item: any): JSX.Element => {
-    var TempUserPropArray = this.state.UserArray;
-    var ManagerName = this.state.PersonaArray[1]["text"];
-
-    TempUserPropArray = TempUserPropArray.filter(function (TempUserPropArray) {
-      return TempUserPropArray["Name"] == ManagerName;
-    });
-
-    return (
-      <div className="hoverCardExample-compactCard">
-        <div className={styles.PaddingSpace}>
-          <div className="ms-Grid" dir="ltr">
-
-            <div className="ms-Grid-row">
-              <div className="ms-Grid-col ms-sm6 ms-md8 ms-lg12">
-                <h3>{TempUserPropArray[0]["Name"]}</h3>
-              </div>
-            </div>
-
-            <div className="ms-Grid-row">
-              <div className="ms-Grid-col ms-sm6 ms-md8 ms-lg12">
-                <Persona
-                  {...this.state.PersonaArray[1]}
-                  size={PersonaSize.size24}
-                  presence={PersonaPresence.online}
-                  hidePersonaDetails={false}
-                />
-              </div>
-            </div>
-
-
-
-
-
-
-          </div>
-          <a target="_blank" >
-          </a>
-        </div>
-      </div>
-    );
-  };
 
   public render(): React.ReactElement<IWPprojectdetailsProps> {
 
-    const expandingCardProps: IExpandingCardProps = {
-      onRenderCompactCard: this._onRenderCompactCard,
-      onRenderExpandedCard: this._onRenderExpandedCard,
-      renderData: this.state.PersonaArray[1],
-      directionalHint: DirectionalHint.rightCenter,
-      directionalHintFixed: true,
-      gapSpace: 16,
-      mode: ExpandingCardMode.expanded,
-      expandedCardHeight: 200,
-      compactCardHeight: 100,
-
+    const alertClicked = (): void => {
+      alert('Clicked');
     };
 
 
-    if (this.state.PersonNameArray.length > 0) {
-      var tmp = this.state.PersonNameArray;
-      var PersonaPerSonsArray = tmp.map(function (item, i) {
-        return (
-          <div>
-            <div onClick={this.GetContactCardTeamMembers(item)}>
-              <Persona
-                imageInitials=''
-                text={item}
-                size={PersonaSize.size24}
-                presence={PersonaPresence.online}
-                hidePersonaDetails={false}
-              />
-            </div>
-          </div>
-        );
-      }, this);
-    }
 
     if (this.state._items.length > 0) {
       var FindingArrayOption = this.state._items.map(function (item, i) {
@@ -662,6 +472,8 @@ export default class WPprojectdetails extends React.Component<IWPprojectdetailsP
       }, this);
     }
 
+
+
     return (
       <div className={styles.wPprojectdetails}>
 
@@ -679,27 +491,27 @@ export default class WPprojectdetails extends React.Component<IWPprojectdetailsP
           closeButtonAriaLabel="Close"
           onRenderFooterContent={this._onRenderFooterContent}
         >
+
+          <DefaultButton
+            style={{ color: 'Black', backgroundColor: 'white' }}
+            text='All Projects'
+            onClick={this._onClosePanel}
+          />
+
+          <DefaultButton
+            style={{ color: 'Black', backgroundColor: 'white' }}
+            text='Previous' onClick={this.findPrevious}
+          />
+
+
+          <DefaultButton
+            style={{ color: 'Black', backgroundColor: 'white' }}
+            text='Next'
+            onClick={this.findNext}
+          />
+
+
           <span>
-            <DefaultButton
-              style={{ color: 'Black', backgroundColor: 'white' }}
-              text='All Projects'
-              onClick={this._onClosePanel}
-            />
-
-            <DefaultButton
-              style={{ color: 'Black', backgroundColor: 'white' }}
-              text='Previous' onClick={this.findPrevious}
-            />
-
-
-            <DefaultButton
-              style={{ color: 'Black', backgroundColor: 'white' }}
-              text='Next'
-              onClick={this.findNext}
-            />
-
-
-
 
             {
 
@@ -718,9 +530,9 @@ export default class WPprojectdetails extends React.Component<IWPprojectdetailsP
                   <div className="ms-Grid-row">
                     <div className="ms-Grid-col ms-u-sm6 block">Author - Request By</div>
                     <div className="ms-Grid-col ms-u-sm6 block">
-                      {//this.state.SelectedItemArray[0]["AuthoName"]
-                      }
-                      <Persona
+                    {//this.state.SelectedItemArray[0]["AuthoName"]
+                    }
+                       <Persona
                         {...this.state.PersonaArray[0]}
                         size={PersonaSize.size24}
                         presence={PersonaPresence.online}
@@ -735,31 +547,26 @@ export default class WPprojectdetails extends React.Component<IWPprojectdetailsP
                 <div className={styles.PaddingSpace} >
                   <div className="ms-Grid-row">
                     <div className="ms-Grid-col ms-u-sm6 block">Project Manager</div>
-                    <div className="ms-Grid-col ms-u-sm6 block" onClick={this.GetContcatCardManager.bind(this)}>
-                      <HoverCard id="myID1" instantOpenOnClick={true} expandingCardProps={expandingCardProps}
-                      >
-                        <div className="HoverCard-item">
-                          <Persona
-                            {...this.state.PersonaArray[1]}
-                            size={PersonaSize.size24}
-                            presence={PersonaPresence.online}
-                            hidePersonaDetails={false}
-                          />
-                        </div>
-                      </HoverCard>
+                    <div className="ms-Grid-col ms-u-sm6 block">
+                      <Persona
+                        {...this.state.PersonaArray[1]}
+                        size={PersonaSize.size24}
+                        presence={PersonaPresence.online}
+                        hidePersonaDetails={false}
+                      />
                     </div>
 
                   </div>
                 </div>
 
+
+
+
                 <div className={styles.PaddingSpace} >
                   <div className="ms-Grid-row">
                     <div className="ms-Grid-col ms-u-sm6 block">Team Members</div>
                     <div className="ms-Grid-col ms-u-sm6 block">
-                      <div>
-                        {PersonaPerSonsArray}
-                      </div>
-                    </div>
+                    {this.state.SelectedItemArray[0]["TeamMemebers"]}</div>
                   </div>
                 </div>
 
@@ -774,86 +581,10 @@ export default class WPprojectdetails extends React.Component<IWPprojectdetailsP
 
                 <div className={styles.PaddingSpace} >
                   <div className="ms-Grid-row">
-                    <div className="ms-Grid-col ms-u-sm6 block">Client</div>
+                    <div className="ms-Grid-col ms-u-sm6 block">Client Emails</div>
                     <div className="ms-Grid-col ms-u-sm6 block">client@onmicrosoft.com</div>
                   </div>
                 </div>
-
-                <div className={styles.PaddingSpace} >
-                  <div className="ms-Grid-row">
-                    <div className="ms-Grid-col ms-u-sm6 block">Client Contact</div>
-                    <div className="ms-Grid-col ms-u-sm6 block">client@onmicrosoft.com</div>
-                  </div>
-                </div>
-
-
-                <div className={styles.PaddingSpace} >
-                  <div className="ms-Grid-row">
-                    <div className="ms-Grid-col ms-u-sm6 block">Project Start Date</div>
-                    <div className="ms-Grid-col ms-u-sm6 block">client@onmicrosoft.com</div>
-                  </div>
-                </div>
-
-                <div className={styles.PaddingSpace} >
-                  <div className="ms-Grid-row">
-                    <div className="ms-Grid-col ms-u-sm6 block">Project End Date</div>
-                    <div className="ms-Grid-col ms-u-sm6 block" >
-                    </div>
-
-
-                  </div>
-                </div>
-
-                <div className={styles.PaddingSpace} >
-                  <div className="ms-Grid-row">
-                    <div className="ms-Grid-col ms-u-sm6 block">OpenAir Project Id</div>
-                    <div className="ms-Grid-col ms-u-sm6 block">05151</div>
-                  </div>
-                </div>
-
-                <div className={styles.PaddingSpace} >
-                  <div className="ms-Grid-row">
-                    <div className="ms-Grid-col ms-u-sm6 block">Project Code</div>
-                    <div className="ms-Grid-col ms-u-sm6 block">05151</div>
-                  </div>
-                </div>
-
-                <div className={styles.PaddingSpace} >
-                  <div className="ms-Grid-row">
-                    <div className="ms-Grid-col ms-u-sm6 block">Planned Hours</div>
-                    <div className="ms-Grid-col ms-u-sm6 block">15</div>
-                  </div>
-                </div>
-
-                <div className={styles.PaddingSpace} >
-                  <div className="ms-Grid-row">
-                    <div className="ms-Grid-col ms-u-sm6 block">Planned Days</div>
-                    <div className="ms-Grid-col ms-u-sm6 block">15</div>
-                  </div>
-                </div>
-
-                <div className={styles.PaddingSpace} >
-                  <div className="ms-Grid-row">
-                    <div className="ms-Grid-col ms-u-sm6 block">Reporting Requirements</div>
-                    <div className="ms-Grid-col ms-u-sm6 block">Reporting Requirements</div>
-                  </div>
-                </div>
-
-                <div className={styles.PaddingSpace} >
-                  <div className="ms-Grid-row">
-                    <div className="ms-Grid-col ms-u-sm6 block">Project Deliverables</div>
-                    <div className="ms-Grid-col ms-u-sm6 block">Project Deliverables</div>
-                  </div>
-                </div>
-
-                <div className={styles.PaddingSpace} >
-                  <div className="ms-Grid-row">
-                    <div className="ms-Grid-col ms-u-sm6 block">Useful Links</div>
-                    <div className="ms-Grid-col ms-u-sm6 block">Useful Links</div>
-                  </div>
-                </div>
-
-
 
 
                 <div className={styles.PaddingSpace} >
@@ -882,6 +613,10 @@ export default class WPprojectdetails extends React.Component<IWPprojectdetailsP
       </div >
     );
   }
+
+
+
+
 
 
 }

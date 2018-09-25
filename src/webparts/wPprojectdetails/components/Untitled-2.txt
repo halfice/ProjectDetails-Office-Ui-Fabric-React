@@ -1,0 +1,359 @@
+
+import * as React from 'react';
+import styles from './WPprojectdetails.module.scss';
+import { IWPprojectdetailsProps } from './IWPprojectdetailsProps';
+import { escape } from '@microsoft/sp-lodash-subset';
+import { default as pnp, ItemAddResult, Web, ReorderingRuleMatchType, RoleDefinitionBindings } from "sp-pnp-js";
+
+import { DefaultButton } from 'ofimport { getSplitButtonVerticalDividerClassNames } from 'office-ui-fabric-react/lib/components/ContextualMenu/ContextualMenu.classNames';
+fice-ui-fabric-react';
+import { Panel, PanelType } from 'office-ui-fabric-react/lib/Panel';
+
+import { FocusZone, FocusZoneDirection } from 'office-ui-fabric-react/lib/FocusZone';
+import { List } from 'office-ui-fabric-react/lib/List';
+import { Image, ImageFit } from 'office-ui-fabric-react/lib/Image';
+import 'office-ui-fabric-react/lib/components/List/Examples/List.Ghosting.Example.scss';
+
+import {
+  DetailsList,
+  DetailsListLayoutMode,
+  Selection,
+  IColumn,
+  IDetailsList
+} from 'office-ui-fabric-react/lib/DetailsList';
+
+
+
+export default class WPprojectdetails extends React.Component<IWPprojectdetailsProps, {}> {
+
+  public state: IWPprojectdetailsProps;
+
+  constructor(props, context) {
+    super(props);
+    this.state = {
+      spHttpClient: this.props.spHttpClient,
+      description: "",
+      siteurl: this.props.siteurl,
+      EmployeeName: "",
+      EmployeeNumber: "",
+      EmployeeEmail: "",
+      ProjectName: "",
+      ProjetDescription: "",
+      ProjectManager: "",
+      ProjectTeam: "",
+      _items: [],
+      showPanel: false,
+      SelectedItemId: 0,
+      SelectedItemArray: [],
+      AuthorDisplayName: "",
+      BusinessManagerName: "",
+      TeamMembersName: "",
+
+    };
+    this.itemdetails = this.itemdetails.bind(this);
+    this.findNext = this.findNext.bind(this);
+    this.findPrevious = this.findPrevious.bind(this);
+  }
+
+
+
+
+  componentDidMount() {
+    this.GetUSerDetails();
+  }
+
+
+  private GetUSerDetails() {
+    var NewISiteUrl = this.props.siteurl;
+    var NewSiteUrl = NewISiteUrl.replace("/SitePages", "");
+    let webx = new Web(NewSiteUrl);
+    var TempEmailFinal = "";
+    pnp.sp.profiles.myProperties.get().then(function (result) {
+      var props = result.UserProfileProperties;
+      var propValue = "";
+
+      props.forEach(function (prop) {
+        if (prop.Key == "AccountName") {
+          var TempEmail = prop.Value;
+          var TempEmailFinal = TempEmail.replace("i:0#.f|membership|", "");
+        }
+      });
+    });
+    this.getProjectdetails();
+    this.setState({
+      Loading: 0,
+      EmployeeEmail: TempEmailFinal
+    });
+
+  }
+
+  public getuserNamesById(id)
+  {
+    var DisplayNAme="";
+    var NewISiteUrl = this.props.siteurl;
+    var NewSiteUrl = NewISiteUrl.replace("/SitePages", "");
+    let webx = new Web(NewSiteUrl);
+    webx.siteUsers.getById(id).get().then(function(result) {
+      var userInfo = "";
+      props.forEach(function (prop) {
+        if (prop.Key == "AccountName") {
+          DisplayNAme = prop.Value;
+        }
+      });
+      return DisplayNAme;      
+  });
+  }
+
+  private getProjectdetails() {
+    var NewISiteUrl = this.props.siteurl;
+    var NewSiteUrl = NewISiteUrl.replace("/SitePages", "");
+    let webx = new Web(NewSiteUrl);
+    webx.lists.getByTitle('Demo2').items.get().then(item => {
+      console.log(item);
+      var ArTemp = [];
+      var Counter = 1;
+      for (var i = 0; i < item.length; i++) {
+
+        var NewData = {
+          key: Counter,
+          thumbnail: item[i].Title,
+          cover: item[i].Title,
+          name: item[i].Title,
+          description: item[i].Description,
+          index: Counter,
+          id: item[i].Id,
+          AuthorId: item[i].AuthorId,
+          ManagerId: item[i].ManagerId,
+          TeamMembersId: item[i].TeamMembersId,
+
+        }
+        ArTemp.push(NewData);
+      }
+      this.setState({
+        _items: ArTemp,
+      });
+
+
+    });
+  }
+
+  private _setShowPanel = (showPanel: boolean): (() => void) => {
+    return (): void => {
+      this.setState({ showPanel });
+    };
+  };
+
+  public itemdetails(event: any): void {
+    var tmpString = event.target.id;
+    var tmpid = parseInt(tmpString);
+    var TempAllArray = this.state._items;
+    var TempComplete = [];
+
+    TempComplete = TempAllArray.filter(function (TempAllArray) {
+      return TempAllArray["id"] == tmpid;
+    });
+    this.setState(
+      {
+        SelectedItemId: parseInt(tmpString),
+        showPanel: true,
+        SelectedItemArray: TempComplete,
+      }
+    )
+  }
+
+
+
+
+  private _onClosePanel = () => {
+    this.setState({ showPanel: false });
+  };
+
+  private _onRenderFooterContent = (): JSX.Element => {
+    return (
+      <div>
+        <DefaultButton onClick={this._onClosePanel} style={{ marginRight: '8px' }}>
+          Save
+        </DefaultButton>
+        <DefaultButton onClick={this._onClosePanel}>Cancel</DefaultButton>
+      </div>
+    );
+  };
+
+  public findNext() {
+    
+    var name=this.getuserNamesById(17);
+    var tempCurrenItem = this.state.SelectedItemId;
+    if (tempCurrenItem < this.state._items.length) {
+      var NewTempNumber = tempCurrenItem + 1;
+      var TempAllArray = this.state._items;
+      var TempComplete = TempAllArray.filter(function (TempAllArray) {
+        return TempAllArray["id"] == NewTempNumber;
+      });
+      this.setState(
+        {
+          SelectedItemId: NewTempNumber,
+          showPanel: true,
+          SelectedItemArray: TempComplete,
+        });
+    }
+
+
+  }
+
+  public findPrevious() {
+    var tempCurrenItem = this.state.SelectedItemId;
+    var NewTempNumber = tempCurrenItem - 1;
+    if (NewTempNumber >= 1) {
+      var TempAllArray = this.state._items;
+      var TempComplete = TempAllArray.filter(function (TempAllArray) {
+        return TempAllArray["id"] == NewTempNumber;
+      });
+      this.setState(
+        {
+          SelectedItemId: NewTempNumber,
+          showPanel: true,
+          SelectedItemArray: TempComplete,
+        });
+
+    }
+  }
+
+
+
+
+  public render(): React.ReactElement<IWPprojectdetailsProps> {
+
+    const alertClicked = (): void => {
+      alert('Clicked');
+    };
+
+
+
+    if (this.state._items.length > 0) {
+      var FindingArrayOption = this.state._items.map(function (item, i) {
+        return (<div >
+          <div className="ms-ListGhostingExample-itemCell">
+            <span className={styles.PrimaryItem}>{item["id"]}</span>
+            <div className="ms-ListGhostingExample-itemContent">
+              <div className="ms-ListGhostingExample-itemName" onClick={this.itemdetails.bind(this)} >
+                <span className={styles.myspan} id={item["id"]}  >
+                  {item["name"]}</span>
+              </div>
+              <div className="ms-ListGhostingExample-itemIndex">{item["description"]}</div>
+            </div>
+          </div>
+        </div>)
+      }, this);
+    }
+
+
+
+    return (
+      <div className={styles.wPprojectdetails}>
+
+        {
+          FindingArrayOption
+        }
+
+
+        <Panel
+          isOpen={this.state.showPanel}
+          type={PanelType.medium}
+          onDismiss={this._onClosePanel}
+          isFooterAtBottom={true}
+          headerText="Projects Information Tool"
+          closeButtonAriaLabel="Close"
+          onRenderFooterContent={this._onRenderFooterContent}
+        >
+
+          <DefaultButton
+            style={{ color: 'Black', backgroundColor: 'white' }}
+            text='All Projects'
+            onClick={this._onClosePanel}
+          />
+
+          <DefaultButton
+            style={{ color: 'Black', backgroundColor: 'white' }}
+            text='Previous' onClick={this.findPrevious}
+          />
+
+
+          <DefaultButton
+            style={{ color: 'Black', backgroundColor: 'white' }}
+            text='Next'
+            onClick={this.findNext}
+          />
+
+
+          <span>
+
+            {
+
+              this.state.SelectedItemArray.length > 0 &&
+              <div>
+
+                <div className={styles.PaddingSpace} >
+                  <div className="ms-Grid-row">
+                    <div className="ms-Grid-col ms-u-sm6 block">Project Name</div>
+                    <div className="ms-Grid-col ms-u-sm6 block">{this.state.SelectedItemArray[0]["name"]}</div>
+                  </div>
+                </div>
+
+
+                <div className={styles.PaddingSpace} >
+                  <div className="ms-Grid-row">
+                    <div className="ms-Grid-col ms-u-sm6 block">Project Name</div>
+                    <div className="ms-Grid-col ms-u-sm6 block">{this.state.SelectedItemArray[0]["name"]}</div>
+                  </div>
+                </div>
+
+
+
+                <div className={styles.PaddingSpace} >
+                  <div className="ms-Grid-row">
+                    <div className="ms-Grid-col ms-u-sm6 block">Project Name</div>
+                    <div className="ms-Grid-col ms-u-sm6 block">{this.state.SelectedItemArray[0]["name"]}</div>
+                  </div>
+                </div>
+
+
+
+
+                <div className={styles.PaddingSpace} >
+                  <div className="ms-Grid-row">
+                    <div className="ms-Grid-col ms-u-sm6 block">Project Name</div>
+                    <div className="ms-Grid-col ms-u-sm6 block">{this.state.SelectedItemArray[0]["name"]}</div>
+                  </div>
+                </div>
+
+
+                <div className={styles.PaddingSpace} >
+                  <div className="ms-Grid-row">
+                    <div className="ms-Grid-col ms-u-sm6 block">Project Name</div>
+                    <div className="ms-Grid-col ms-u-sm6 block">{this.state.SelectedItemArray[0]["name"]}</div>
+                  </div>
+                </div>
+              </div>
+
+            }
+
+
+
+
+
+          </span>
+
+
+
+        </Panel>
+
+      </div >
+    );
+  }
+
+
+
+
+
+
+}

@@ -1,42 +1,24 @@
-<List items={this.state._items} onRenderCell={this._onRenderCell} />
-
-private _onRenderCell2(item: any, index: number | undefined): JSX.Element {
-    return (
-      <div className="ms-ListBasicExample-itemCell" data-is-focusable={true}>
-        <Image
-          className="ms-ListBasicExample-itemImage"
-          src={item.thumbnail}
-          width={50}
-          height={50}
-          imageFit={ImageFit.cover}
-        />
-        <div className="ms-ListBasicExample-itemContent">
-          <div className="ms-ListBasicExample-itemName">{item.name}</div>
-          <div className="ms-ListBasicExample-itemIndex">{item.index}</div>
-          <div className="ms-ListBasicExample-itemDesc">{item.description}</div>
+ <div className="hoverCardExample-compactCard">
+        <div className="ms-Grid" dir="ltr">
+          <div className="ms-Grid-row">
+            <div className="ms-Grid-col ms-sm6 ms-md4 ms-lg8">{this.state.PersonaArray[1]}</div>
+            <div className="ms-Grid-col ms-sm6 ms-md8 ms-lg4">
+              <Persona
+                {...this.state.PersonaArray[1]}
+                size={PersonaSize.size24}
+                presence={PersonaPresence.online}
+                hidePersonaDetails={false}
+              />
+            </div>
+          </div>
         </div>
-      </div>
-    );
-  }
-  
-  private _onRenderCell(item: any, index: number, isScrolling: boolean): JSX.Element {
-    return (
-      <div className="ms-ListGhostingExample-itemCell" data-is-focusable={true}>
-        <Image
-          className="ms-ListGhostingExample-itemImage"
-          src={isScrolling ? undefined : item.index}
-          width={50}
-          height={50}
-          imageFit={ImageFit.cover}
-          alt={item.index}
 
-        />
-        <div className="ms-ListGhostingExample-itemContent">
-          <div className="ms-ListGhostingExample-itemName" >
-          <span className={styles.myspan} >
-          {item.name}</span></div>
-          <div className="ms-ListGhostingExample-itemIndex">{item.description}</div>
+        <div className="ms-Grid" dir="ltr">
+          <div className="ms-Grid-row">
+            <div className="ms-Grid-col ms-sm6 ms-md4 ms-lg12">
+              Organization</div>
+          </div>
         </div>
+
+
       </div>
-    );
-  }
