@@ -33,6 +33,7 @@ export interface IWPprojectdetailsProps {
   ProjectReportingRequirements: string;
   ProjectDeliverables: string;
   ProjectUsefulLinks: string;
+  CurrentIemCounter:number;
 
 }
 

@@ -65,6 +65,7 @@ export default class WPprojectdetails extends React.Component<IWPprojectdetailsP
       ProjectReportingRequirements: "",
       ProjectDeliverables: "",
       ProjectUsefulLinks: "",
+      CurrentIemCounter:1,
 
 
 
@@ -131,6 +132,7 @@ export default class WPprojectdetails extends React.Component<IWPprojectdetailsP
           ManagerName: item[i].ManagerId,
           TeamMemebers: item[i].TeamMembersId,
         }
+        Counter++;
         ArTemp.push(NewData);
         if (this.inArray(item[i].AuthorId, UsrTemp) == false) {
           UsrTemp.push(item[i].AuthorId);
@@ -160,6 +162,7 @@ export default class WPprojectdetails extends React.Component<IWPprojectdetailsP
 
     });
   }
+
   public ParsingUserNames() {
     this.getuserNamesById();
   }
@@ -294,6 +297,7 @@ export default class WPprojectdetails extends React.Component<IWPprojectdetailsP
         SelectedItemArray: TempComplete,
         PersonaArray: TempPerosonaArra,
         PersonNameArray: TeamMemebrNameString,
+        CurrentIemCounter:TempComplete[0]["key"],
       }
     )
   }
@@ -314,8 +318,7 @@ export default class WPprojectdetails extends React.Component<IWPprojectdetailsP
   };
 
   public findNext() {
-
-    var tempCurrenItem = this.state.SelectedItemId;
+    var tempCurrenItem = this.state.CurrentIemCounter;
     var TempPerosonaArra = [];
     var FinalName = "";
 
@@ -323,7 +326,7 @@ export default class WPprojectdetails extends React.Component<IWPprojectdetailsP
       var NewTempNumber = tempCurrenItem + 1;
       var TempAllArray = this.state._items;
       var TempComplete = TempAllArray.filter(function (TempAllArray) {
-        return TempAllArray["id"] == NewTempNumber;
+        return TempAllArray["key"] == NewTempNumber;
       });
 
       var AuthorIdInArray = TempComplete[0]["AuthoName"];
@@ -391,9 +394,12 @@ export default class WPprojectdetails extends React.Component<IWPprojectdetailsP
         TempComplete[0]["TeamMemebers"] = TeamMemebrNameString;
       }
 
+
       this.setState(
         {
-          SelectedItemId: NewTempNumber,
+
+          CurrentIemCounter:NewTempNumber,
+          SelectedItemId: TempComplete[0]["Id"],
           showPanel: true,
           SelectedItemArray: TempComplete,
           PersonaArray: TempPerosonaArra,
@@ -406,13 +412,13 @@ export default class WPprojectdetails extends React.Component<IWPprojectdetailsP
   }
 
   public findPrevious() {
-    var tempCurrenItem = this.state.SelectedItemId;
+    var tempCurrenItem = this.state.CurrentIemCounter;
     var NewTempNumber = tempCurrenItem - 1;
     var TempPerosonaArra = [];
     if (NewTempNumber >= 1) {
       var TempAllArray = this.state._items;
       var TempComplete = TempAllArray.filter(function (TempAllArray) {
-        return TempAllArray["id"] == NewTempNumber;
+        return TempAllArray["key"] == NewTempNumber;
       });
 
       var AuthorIdInArray = TempComplete[0]["AuthoName"];
@@ -483,11 +489,10 @@ export default class WPprojectdetails extends React.Component<IWPprojectdetailsP
         TempComplete[0]["TeamMemebers"] = TeamMemebrNameString;
       }
 
-
-
       this.setState(
         {
-          SelectedItemId: NewTempNumber,
+          CurrentIemCounter:NewTempNumber,
+          SelectedItemId: TempComplete[0]["Id"],
           showPanel: true,
           SelectedItemArray: TempComplete,
           PersonaArray: TempPerosonaArra,
