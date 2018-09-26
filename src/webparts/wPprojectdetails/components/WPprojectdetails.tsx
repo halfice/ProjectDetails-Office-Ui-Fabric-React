@@ -18,6 +18,8 @@ import { Label } from 'office-ui-fabric-react/lib/Label';
 import { HoverCard, IExpandingCardProps, ExpandingCardMode } from 'office-ui-fabric-react/lib/HoverCard';
 
 import { DirectionalHint } from 'office-ui-fabric-react/lib/common/DirectionalHint';
+import { Environment, EnvironmentType } from '@microsoft/sp-core-library';
+
 
 const examplePersona: IPersonaSharedProps = {
   imageInitials: 'AL',
@@ -65,7 +67,7 @@ export default class WPprojectdetails extends React.Component<IWPprojectdetailsP
       ProjectReportingRequirements: "",
       ProjectDeliverables: "",
       ProjectUsefulLinks: "",
-      CurrentIemCounter:1,
+      CurrentIemCounter: 1,
 
 
 
@@ -78,7 +80,92 @@ export default class WPprojectdetails extends React.Component<IWPprojectdetailsP
   }
 
   componentDidMount() {
-    this.GetUSerDetails();
+
+    if (Environment.type === EnvironmentType.Local) {
+      var ArTemp = [];
+      var UsrTemp = [];
+      var Counter = 1;
+      var NewData = {
+        key: 1,
+        thumbnail: "Title",
+        cover: "Cover Title",
+        name: "Project A",
+        description: "Project Description",
+        index: 1,
+        id: 1,
+        AuthoName: "1",
+        ManagerName: "2",
+        TeamMemebers: "3",
+      }
+      ArTemp.push(NewData);
+      
+      var NewData2 = {
+        key: 2,
+        thumbnail: "Title 1",
+        cover: "Cover Title ",
+        name: "Project B",
+        description: "Project Description B",
+        index: 2,
+        id: 2,
+        AuthoName: "2",
+        ManagerName: "1",
+        TeamMemebers: "3",
+      }
+      ArTemp.push(NewData2);
+      UsrTemp.push(1);
+      UsrTemp.push(2);
+      UsrTemp.push(3);
+
+      this.setState({
+        _items: ArTemp,
+        UserIds: UsrTemp,
+      });
+
+      var TempUserArray = [];
+
+      var NewItem = {
+        Id: 1,
+        Name: "Test User 1",
+        Organization: "Org A",
+        Email: "test@gmail.com",
+        Tel: "33333333",
+        Location: "City A",
+      }
+      TempUserArray.push(NewItem);
+
+      var NewItem2 = {
+        Id: 2,
+        Name: "Test User 2",
+        Organization: "Org B",
+        Email: "test2@gmail.com",
+        Tel: "88888",
+        Location: "City B",
+      }
+      TempUserArray.push(NewItem2);
+
+      var NewItem3 = {
+        Id: 3,
+        Name: "Test User 3",
+        Organization: "Org C",
+        Email: "test3@gmail.com",
+        Tel: "888888",
+        Location: "City C",
+      }
+      TempUserArray.push(NewItem3);
+
+      this.setState({
+        Loading: 0,
+        EmployeeEmail: 'test@onmicrosoft.com',
+        _items: ArTemp,
+        UserIds: UsrTemp,
+        UserArray: TempUserArray
+      });
+
+    } else {
+      this.GetUSerDetails();
+    }
+
+
   }
   private GetUSerDetails() {
     var NewISiteUrl = this.props.siteurl;
@@ -96,10 +183,6 @@ export default class WPprojectdetails extends React.Component<IWPprojectdetailsP
       });
     });
     this.getProjectdetails();
-
-
-
-
     this.setState({
       Loading: 0,
       EmployeeEmail: TempEmailFinal,
@@ -193,9 +276,6 @@ export default class WPprojectdetails extends React.Component<IWPprojectdetailsP
       UserArray: TempUserArray
     });
 
-
-
-
   }
 
   public inArray(needle, haystack) {
@@ -213,6 +293,11 @@ export default class WPprojectdetails extends React.Component<IWPprojectdetailsP
   };
 
   public itemdetails(event: any): void {
+    if (Environment.type === EnvironmentType.Local) {
+      this.itemdetailsDummy(event.target.id);
+      return;
+    }
+
     var tmpString = event.target.id;
     var tmpid = parseInt(tmpString);
     var TempAllArray = this.state._items;
@@ -297,10 +382,12 @@ export default class WPprojectdetails extends React.Component<IWPprojectdetailsP
         SelectedItemArray: TempComplete,
         PersonaArray: TempPerosonaArra,
         PersonNameArray: TeamMemebrNameString,
-        CurrentIemCounter:TempComplete[0]["key"],
+        CurrentIemCounter: TempComplete[0]["key"],
       }
     )
   }
+
+
 
   private _onClosePanel = () => {
     this.setState({ showPanel: false });
@@ -398,7 +485,7 @@ export default class WPprojectdetails extends React.Component<IWPprojectdetailsP
       this.setState(
         {
 
-          CurrentIemCounter:NewTempNumber,
+          CurrentIemCounter: NewTempNumber,
           SelectedItemId: TempComplete[0]["Id"],
           showPanel: true,
           SelectedItemArray: TempComplete,
@@ -491,7 +578,7 @@ export default class WPprojectdetails extends React.Component<IWPprojectdetailsP
 
       this.setState(
         {
-          CurrentIemCounter:NewTempNumber,
+          CurrentIemCounter: NewTempNumber,
           SelectedItemId: TempComplete[0]["Id"],
           showPanel: true,
           SelectedItemArray: TempComplete,
@@ -887,6 +974,100 @@ export default class WPprojectdetails extends React.Component<IWPprojectdetailsP
       </div >
     );
   }
+
+  /********************** Dummy Data  */
+  public itemdetailsDummy(id): void {
+    
+    var tmpString = id;
+    var tmpid = parseInt(tmpString);
+    var TempAllArray = this.state._items;
+    var TempComplete = [];
+
+    var TempPerosonaArra = [];
+
+    TempComplete = TempAllArray.filter(function (TempAllArray) {
+      return TempAllArray["id"] == tmpid;
+    });
+
+
+    var AuthorIdInArray = TempComplete[0]["AuthoName"];
+    var ManagerIdInArray = TempComplete[0]["ManagerName"];
+    var TeammembersIdsArray = TempComplete[0]["TeamMemebers"];
+
+    var FinalName = "";
+    var UserArray1 = this.state.UserArray;
+    if (isNaN(AuthorIdInArray) == false) {
+      UserArray1 = UserArray1.filter(function (UserArray1) {
+        return UserArray1["Id"] == AuthorIdInArray;
+      });
+      TempComplete[0]["AuthoName"] = UserArray1[0]["Name"];
+      FinalName = UserArray1[0]["Name"];
+    } else {
+      FinalName = TempComplete[0]["AuthoName"];
+    }
+
+    var NewObject1 = {
+      imageInitials: '',
+      text: FinalName,
+      secondaryText: 'Software Engineer',
+      tertiaryText: 'In a meeting',
+      optionalText: 'Available at 4:00pm'
+    }
+    TempPerosonaArra.push(NewObject1);
+
+
+
+    UserArray1 = this.state.UserArray;
+    if (isNaN(ManagerIdInArray) == false) {
+      UserArray1 = UserArray1.filter(function (UserArray1) {
+        return UserArray1["Id"] == ManagerIdInArray;
+      });
+      TempComplete[0]["ManagerName"] = UserArray1[0]["Name"];
+      FinalName = UserArray1[0]["Name"];
+    } else {
+      FinalName = TempComplete[0]["ManagerName"];
+    }
+
+    var NewObject2 = {
+      imageInitials: '',
+      text: FinalName,
+      secondaryText: 'Software Engineer',
+      tertiaryText: 'In a meeting',
+      optionalText: 'Available at 4:00pm'
+    }
+    TempPerosonaArra.push(NewObject2);
+
+    var Arobject = [];
+
+    var TeamMemebrNameString = [];
+
+    for (var y = 0; y < TeammembersIdsArray.length; y++) {
+
+      var UserArray1 = this.state.UserArray;
+      if (isNaN(TeammembersIdsArray[y]) == false) {
+        UserArray1 = UserArray1.filter(function (UserArray1) {
+          return UserArray1["Id"] == TeammembersIdsArray[y];
+        });
+        TeamMemebrNameString.push(UserArray1[0]["Name"]);
+      } else {
+        TeamMemebrNameString.push(TeammembersIdsArray[y]);
+      }
+    }
+    TempComplete[0]["TeamMemebers"] = TeamMemebrNameString;
+    TempPerosonaArra.push(Arobject);
+    this.setState(
+      {
+        SelectedItemId: parseInt(tmpString),
+        showPanel: true,
+        SelectedItemArray: TempComplete,
+        PersonaArray: TempPerosonaArra,
+        PersonNameArray: TeamMemebrNameString,
+        CurrentIemCounter: TempComplete[0]["key"],
+      }
+    )
+  }
+
+  /***********Dummy Data End********************/
 
 
 }
