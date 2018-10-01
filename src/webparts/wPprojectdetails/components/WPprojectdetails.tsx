@@ -197,6 +197,7 @@ export default class WPprojectdetails extends React.Component<IWPprojectdetailsP
     var NewISiteUrl = this.props.siteurl;
     var NewSiteUrl = NewISiteUrl.replace("/SitePages", "");
     let webx = new Web(NewSiteUrl);
+    //webx.lists.getByTitle('Demo2').items.filter("Author eq " + userId).get().then(item => {
     webx.lists.getByTitle('Demo2').items.get().then(item => {
       console.log(item);
       var ArTemp = [];
